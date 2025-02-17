@@ -12,10 +12,10 @@ class User(AbstractUser):
         return self.username
     
 
-class PasswordResetToken(models.Model):
+class PasswordResetOTP(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    token = models.CharField(max_length=5, unique=True)
+    otp = models.CharField(max_length=5, unique=True)
     expires_at = models.DateTimeField()
 
     def __str__(self):
-        return self.token
+        return self.otp
