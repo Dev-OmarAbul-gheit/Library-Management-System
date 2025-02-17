@@ -152,3 +152,8 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'system.User'
+
+# Configure Django to Use Mailhog
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
