@@ -1,8 +1,11 @@
-from djoser.serializers import UserCreateSerializer
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import authenticate
+from django.utils.crypto import get_random_string
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
-from .models import User
+from djoser.serializers import UserCreateSerializer
+from .models import User, PasswordResetOTP
 
 class UserSerializer(serializers.Serializer):    
     email = serializers.EmailField(write_only=True)
@@ -44,3 +47,20 @@ class LoginUserSerializer(UserSerializer, serializers.Serializer):
     def create(self, validated_data):
         user = self.authenticate_user(validated_data)
         return self.create_user_tokens(user)
+
+
+class CreateOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def create(self, validated_data):
+        email = validated_data['email']
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('No user exists with the given email address.')
+
+        otp = get_random_string(length=5)
+        expires_at = timezone.now() + timezone.timedelta(minutes=10)
+
+        PasswordResetOTP.objects.create(user=user, otp=otp, expires_at=expires_at)
+        return {'username': user.username, 'email': email, 'otp': otp}
