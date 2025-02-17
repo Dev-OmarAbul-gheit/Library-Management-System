@@ -1,7 +1,10 @@
+from django.forms import ValidationError
 from django.utils import timezone
-from django.shortcuts import get_object_or_404
+from django.db import transaction
 from django.contrib.auth import authenticate
 from django.utils.crypto import get_random_string
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from djoser.serializers import UserCreateSerializer
@@ -64,3 +67,35 @@ class CreateOTPSerializer(serializers.Serializer):
 
         PasswordResetOTP.objects.create(user=user, otp=otp, expires_at=expires_at)
         return {'username': user.username, 'email': email, 'otp': otp}
+    
+
+class UpdateUserPassword(serializers.Serializer):
+    otp = serializers.CharField()
+    new_password = serializers.CharField()
+
+    def validate_otp(self, otp):
+        if not PasswordResetOTP.objects.filter(otp=otp, expires_at__gt=timezone.now()).exists():
+            raise serializers.ValidationError('Invalid or expired confirmation code.')
+        return otp
+    
+    def validate_new_password(self, new_password):
+        try:
+            validate_password(new_password)
+        except ValidationError as e:
+            raise serializers.ValidationError(e.messages)
+        return new_password
+    
+    def create(self, validated_data):
+        otp = PasswordResetOTP.objects.get(otp=validated_data['otp'], expires_at__gt=timezone.now())
+
+        with transaction.atomic():
+            # Update the user's password
+            user = otp.user
+            user.password = make_password(validated_data['new_password'])
+            user.save()
+            self.instance = user
+
+            # Delete the otp
+            otp.delete()
+
+        return self.instance

@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from templated_mail.mail import BaseEmailMessage
 from .models import User, PasswordResetOTP
-from .serializers import RegisterUserSerializer, LoginUserSerializer, CreateOTPSerializer
+from .serializers import RegisterUserSerializer, LoginUserSerializer, CreateOTPSerializer, UpdateUserPassword
 
 
 class RegisterView(CreateAPIView):
@@ -48,3 +48,14 @@ class RequestPasswordResetViewSet(CreateModelMixin, GenericViewSet):
             return Response({'error': 'Invalid header found.'}, status=status.HTTP_400_BAD_REQUEST)
         
         return Response({'message': 'Password reset email sent.'}, status=status.HTTP_200_OK)
+    
+
+class ConfirmPasswordResetViewSet(CreateAPIView, GenericViewSet):
+    queryset = User.objects.all()
+    serializer_class = UpdateUserPassword
+
+    def create(self, request):
+        serializer = UpdateUserPassword(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'message': 'Your password has been reset successfully.'}, status=status.HTTP_200_OK)
