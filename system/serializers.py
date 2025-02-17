@@ -55,16 +55,17 @@ class LoginUserSerializer(UserSerializer, serializers.Serializer):
 class CreateOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
+    def validate_email(self,email):
+        if not User.objects.filter(email=email).exists():
+            raise serializers.ValidationError('No user exists with the given email address.')
+        return email
+
     def create(self, validated_data):
         email = validated_data['email']
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            raise serializers.ValidationError('No user exists with the given email address.')
+        user = User.objects.get(email=email)
 
         otp = get_random_string(length=5)
         expires_at = timezone.now() + timezone.timedelta(minutes=10)
-
         PasswordResetOTP.objects.create(user=user, otp=otp, expires_at=expires_at)
         return {'username': user.username, 'email': email, 'otp': otp}
     
