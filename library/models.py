@@ -40,3 +40,29 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
+
+
+class Book(models.Model):
+    title = models.CharField(max_length=255)
+    summary = models.TextField(null=True, blank=True)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='books')
+    libraries = models.ManyToManyField(Library, through='BookLibrary', related_name='books')
+
+    def __str__(self):
+        return self.title
+    
+    class Meta:
+        verbose_name = 'Book'
+        verbose_name_plural = 'Books'
+
+
+class BookLibrary(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    library = models.ForeignKey(Library, on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+    is_borrowed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.book.title} at {self.library.name}"
