@@ -19,6 +19,12 @@ class LoginViewSet(CreateModelMixin, GenericViewSet):
     queryset = User.objects.all()
     serializer_class = LoginUserSerializer
 
+    def create(self, request):
+        serializer = LoginUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class RequestPasswordResetViewSet(CreateModelMixin, GenericViewSet):
     queryset = PasswordResetOTP.objects.all()
