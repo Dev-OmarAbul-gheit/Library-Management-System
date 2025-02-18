@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'djoser',
-    'system',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -151,7 +151,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1)
 }
 
-AUTH_USER_MODEL = 'system.User'
+AUTH_USER_MODEL = 'user.User'
 
 # Configure Django to Use Mailhog
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
