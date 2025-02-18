@@ -32,10 +32,19 @@ class RegisterUserSerializer(UserSerializer, UserCreateSerializer):
     class Meta(UserCreateSerializer.Meta):
         fields = ['username', 'email', 'password', 'refresh_token', 'access_token']
 
+    def validate_username(self, username):
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError('A user with this username already exists.')
+        return username
+
+    def validate_email(self, email):
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError('A user with this email already exists.')
+        return email
+
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
-        tokens = self.create_user_tokens(user)
-        return {'user': user, **tokens}
+        return self.create_user_tokens(user)
 
 
 class LoginUserSerializer(UserSerializer, serializers.Serializer):
