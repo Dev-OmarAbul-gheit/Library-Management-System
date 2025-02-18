@@ -14,3 +14,15 @@ class Library(models.Model):
     class Meta:
         verbose_name = "Library"
         verbose_name_plural = "Libraries"
+
+
+class Author(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    bio = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "Author"
+        verbose_name_plural = "Authors"
