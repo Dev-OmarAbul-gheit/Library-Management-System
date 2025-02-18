@@ -10,9 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from djoser.serializers import UserCreateSerializer
 from .models import User, PasswordResetOTP
 
-class UserSerializer(serializers.Serializer):    
-    email = serializers.EmailField(write_only=True)
-    password = serializers.CharField(write_only=True)
+class TokenSerializer(serializers.Serializer):    
     refresh_token = serializers.CharField(read_only=True)
     access_token = serializers.CharField(read_only=True)
 
@@ -26,10 +24,17 @@ class UserSerializer(serializers.Serializer):
         return {'refresh_token' : str(refresh_token), 'access_token' : str(access_token)}
 
 
-class RegisterUserSerializer(UserSerializer, UserCreateSerializer):
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+class RegisterUserSerializer(TokenSerializer, UserCreateSerializer):
     username = serializers.CharField(write_only=True)
-    
-    class Meta(UserCreateSerializer.Meta):
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
         fields = ['username', 'email', 'password', 'refresh_token', 'access_token']
 
     def validate_username(self, username):
@@ -47,7 +52,10 @@ class RegisterUserSerializer(UserSerializer, UserCreateSerializer):
         return self.create_user_tokens(user)
 
 
-class LoginUserSerializer(UserSerializer, serializers.Serializer):
+class LoginUserSerializer(TokenSerializer, serializers.Serializer):
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True)
+
     def authenticate_user(self, credentials):
         email = credentials['email']
         password = credentials['password']
@@ -72,11 +80,7 @@ class CreateOTPSerializer(serializers.Serializer):
     def create(self, validated_data):
         email = validated_data['email']
         user = User.objects.get(email=email)
-
-        otp = get_random_string(length=5)
-        expires_at = timezone.now() + timezone.timedelta(minutes=10)
-        PasswordResetOTP.objects.create(user=user, otp=otp, expires_at=expires_at)
-        return {'username': user.username, 'email': email, 'otp': otp}
+        return PasswordResetOTP.objects.create(user=user)
     
 
 class UpdateUserPassword(serializers.Serializer):
@@ -103,9 +107,8 @@ class UpdateUserPassword(serializers.Serializer):
             user = otp.user
             user.password = make_password(validated_data['new_password'])
             user.save()
-            self.instance = user
 
             # Delete the otp
             otp.delete()
 
-        return self.instance
+        return otp.user

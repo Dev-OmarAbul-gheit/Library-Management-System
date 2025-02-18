@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
-
+from .utils import generate_otp
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
@@ -14,7 +14,7 @@ class User(AbstractUser):
 
 class PasswordResetOTP(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    otp = models.CharField(max_length=5, unique=True)
+    otp = models.CharField(max_length=5, unique=True, default=generate_otp)
     expires_at = models.DateTimeField()
 
     def __str__(self):
