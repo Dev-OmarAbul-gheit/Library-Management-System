@@ -2,22 +2,20 @@ from django.db import models
 from django.conf import settings
 from datetime import timedelta
 from django.core.exceptions import ValidationError
-
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.gis.db import models as gis_models
 
 
 class Library(models.Model):
     name = models.CharField(max_length=255, unique=True)
     location = models.CharField(max_length=255, unique=True)
-    latitude = models.FloatField(validators=[MinValueValidator(-90), MaxValueValidator(90)])
-    longitude = models.FloatField(validators=[MinValueValidator(-180), MaxValueValidator(180)])
-    
+    coordinates = gis_models.PointField(geography=True, srid=4326, null=True, blank=True)
+
     def __str__(self):
         return self.name
     
     class Meta:
-        verbose_name = "Library"
-        verbose_name_plural = "Libraries"
+        verbose_name = 'Library'
+        verbose_name_plural = 'Libraries'
 
 
 class Author(models.Model):
