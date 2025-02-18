@@ -48,7 +48,7 @@ class Book(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='books')
-    libraries = models.ManyToManyField(Library, through='BookLibrary', related_name='books')
+    libraries = models.ManyToManyField(Library, through='LibraryBook', related_name='books')
 
     def __str__(self):
         return self.title
@@ -58,7 +58,7 @@ class Book(models.Model):
         verbose_name_plural = 'Books'
 
 
-class BookLibrary(models.Model):
+class LibraryBook(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     library = models.ForeignKey(Library, on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
