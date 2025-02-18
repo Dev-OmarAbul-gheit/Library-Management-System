@@ -10,12 +10,12 @@ from .models import User, PasswordResetOTP
 from .serializers import RegisterUserSerializer, LoginUserSerializer, CreateOTPSerializer, UpdateUserPassword
 
 
-class RegisterView(CreateAPIView):
+class RegisterViewSet(CreateModelMixin, GenericViewSet):
     queryset = User.objects.all()
     serializer_class = RegisterUserSerializer
 
 
-class LoginView(CreateAPIView):
+class LoginViewSet(CreateModelMixin, GenericViewSet):
     queryset = User.objects.all()
     serializer_class = LoginUserSerializer
 
