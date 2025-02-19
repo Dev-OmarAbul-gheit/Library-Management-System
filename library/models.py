@@ -49,7 +49,7 @@ class Book(models.Model):
     summary = models.TextField(null=True, blank=True)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     publication_date = models.DateTimeField(null=True, blank=True)
-    cover_image = models.ImageField(upload_to='library/books/images')
+    cover_image = models.ImageField(upload_to='library/books/images', null=True, blank=True)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='books')
     libraries = models.ManyToManyField(Library, through='LibraryBook', related_name='books')
