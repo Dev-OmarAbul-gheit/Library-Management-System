@@ -13,6 +13,15 @@ class Library(models.Model):
     def __str__(self):
         return self.name
     
+    def clean_coordinates(self, coordinates):
+        latitude = coordinates[0]
+        longitude = coordinates[1]
+        if latitude < -90 or latitude > 90:
+            raise ValidationError("Latitude must be between -90 and 90")
+        if longitude < -180 or longitude > 180:
+            raise ValidationError("Longitude must be between -180 and 180")
+        return coordinates
+    
     class Meta:
         verbose_name = 'Library'
         verbose_name_plural = 'Libraries'
