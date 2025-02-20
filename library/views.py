@@ -1,18 +1,18 @@
 from django.db.models import Count
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Library, Author, Book
 from .serializers import LibrarySerializer, AuthorSerializer, BookSerializer
 
 
-class LibraryViewSet(ModelViewSet):
+class LibraryViewSet(ReadOnlyModelViewSet):
     queryset = Library.objects.prefetch_related('books__category', 'books__author').distinct().all()
     serializer_class = LibrarySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['id', 'books__category', 'books__author']
 
 
-class AuthorViewSet(ModelViewSet):
+class AuthorViewSet(ReadOnlyModelViewSet):
     queryset = Author.objects \
                      .annotate(book_count=Count('books')) \
                      .prefetch_related('books__category', 'books__libraries') \
@@ -22,7 +22,7 @@ class AuthorViewSet(ModelViewSet):
     filterset_fields = ['books__category', 'books__libraries']
 
 
-class BookViewSet(ModelViewSet):
+class BookViewSet(ReadOnlyModelViewSet):
     queryset = Book.objects \
                    .select_related('category', 'author') \
                    .prefetch_related('libraries') \
