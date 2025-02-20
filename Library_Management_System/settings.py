@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'djoser',
     'django.contrib.gis',
     'django_filters',
-    'user',
+    'user_app',
     'library',
 ]
 
@@ -156,7 +156,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1)
 }
 
-AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'user_app.User'
 
 # Configure Django to Use Mailhog
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
