@@ -1,8 +1,11 @@
 from django.db.models import Count
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Library, Author, Book
-from .serializers import LibrarySerializer, AuthorSerializer, BookSerializer
+from .models import Library, Author, Book, BorrowingTransaction
+from .serializers import LibrarySerializer, AuthorSerializer, BookSerializer, BorrowingTransactionSerializer
 
 
 class LibraryViewSet(ReadOnlyModelViewSet):
@@ -28,3 +31,15 @@ class BookViewSet(ReadOnlyModelViewSet):
                    .prefetch_related('libraries') \
                    .all()
     serializer_class = BookSerializer
+
+
+class BorrowingTransactionViewSet(ReadOnlyModelViewSet):
+    queryset = BorrowingTransaction.objects.all()
+    serializer_class = BorrowingTransactionSerializer
+
+    @action(detail=False, methods=['post'], url_path='borrow', url_name='borrow-book')
+    def borrow_book(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
