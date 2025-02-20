@@ -1,12 +1,13 @@
 from rest_framework import serializers
 from .models import Library, Author, Book
-import re
 
 
 class LibrarySerializer(serializers.ModelSerializer):
+    coordinates = serializers.ListField(child=serializers.FloatField())
+
     class Meta:
         model = Library
-        fields = ['id', 'name', 'location', 'coordinates'] # "coordinates": "POINT (longitude latitude)"
+        fields = ['id', 'name', 'location', 'coordinates']
 
 
 class AuthorSerializer(serializers.ModelSerializer):
