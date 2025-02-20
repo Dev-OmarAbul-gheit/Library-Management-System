@@ -90,24 +90,16 @@ class BorrowingTransaction(models.Model):
     returned_date = models.DateField(null=True, blank=True)
 
     def __str__(self) -> str:
-        return f"{self.book_library.book.title} borrowed by {self.user.username}"
+        return f"{self.book.book.title} borrowed by {self.borrower.username}"
     
     @property
     def daily_penalty_value(self):
         # Assuming the daily penalty is 1% of the borrowing price
         return self.price * 0.01
     
-    def validate_book_availability(self) -> None | ValidationError:
-        if self.library_book.is_borrowed:
-            raise ValidationError(f'The book "{self.library_book.book.title}" is currently borrowed and not available.')
-
-    def validate_due_date(self) -> None | ValidationError:
-        max_period_month = 1
-        borrowing_date = self.borrowing_date  
-        max_return_date = borrowing_date + timedelta(days=max_period_month * 30)
-
-        if self.due_date > max_return_date:
-            raise ValidationError(f'Return date cannot be more than {max_period_month} month(s) from the borrowing date.')
+    @property
+    def is_borrowed(self) -> bool:
+        return self.book.is_borrowed
 
     def calculate_penalty(self) -> float:
             if self.returned_date > self.due_date:
