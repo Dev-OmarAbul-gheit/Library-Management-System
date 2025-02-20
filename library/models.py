@@ -90,7 +90,7 @@ class BorrowingTransaction(models.Model):
     returned_date = models.DateField(null=True, blank=True)
 
     def __str__(self) -> str:
-        return f"{self.book.book.title} borrowed by {self.borrower.username}"
+        return f"{self.book.book.title} at {self.book.library} is borrowed by {self.borrower.username}"
     
     @property
     def daily_penalty_value(self):
