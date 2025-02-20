@@ -82,9 +82,9 @@ class LibraryBook(models.Model):
 
 
 class BorrowingTransaction(models.Model):
-    price = models.DecimalField(max_digits=6, decimal_places=2)
     book = models.ForeignKey(LibraryBook, on_delete=models.CASCADE)
     borrower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    borrowing_price = models.DecimalField(max_digits=6, decimal_places=2)
     borrowing_date = models.DateField(auto_now_add=True)
     due_date = models.DateField()
     returned_date = models.DateField(null=True, blank=True)
