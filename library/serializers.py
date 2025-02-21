@@ -52,7 +52,7 @@ class BorrowingTransactionSerializer(serializers.ModelSerializer):
 
     def validate_borrower(self, borrower):
         if BorrowingTransaction.objects.filter(borrower=borrower).count() >= 3:
-            raise serializers.ValidationError('The borrower has already borrowed the maximum number of books allowed (3).')
+            raise serializers.ValidationError('The borrower has already reached the maximum number of books allowed to be borrowed (3).')
         return borrower
 
     def create(self, validated_data):
