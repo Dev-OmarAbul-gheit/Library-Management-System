@@ -1,8 +1,9 @@
 from django.db.models import Count
-from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Library, Author, Book, BorrowingTransaction
 from .serializers import LibrarySerializer, AuthorSerializer, BookSerializer, BorrowingTransactionSerializer
@@ -36,6 +37,7 @@ class BookViewSet(ReadOnlyModelViewSet):
 class BorrowingTransactionViewSet(ReadOnlyModelViewSet):
     queryset = BorrowingTransaction.objects.all()
     serializer_class = BorrowingTransactionSerializer
+    permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=['post'], url_path='borrow', url_name='borrow-book')
     def borrow_book(self, request):
