@@ -82,29 +82,20 @@ class LibraryBook(models.Model):
 
 
 class BorrowingTransaction(models.Model):
-    books = models.ManyToManyField(LibraryBook, related_name='books')
+    books = models.ManyToManyField(LibraryBook, related_name='borrowing_books')
     borrower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     borrowing_price = models.DecimalField(max_digits=6, decimal_places=2)
     borrowing_date = models.DateField(auto_now_add=True)
     due_date = models.DateField()
-    returned_date = models.DateField(null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.books.count()} book(s) borrowed by {self.borrower.username}"
-    
-    @property
-    def daily_penalty_value(self):
-        # Assuming the daily penalty is 1% of the borrowing price
-        return self.price * 0.01
-    
-    @property
-    def is_borrowed(self) -> bool:
-        return self.book.is_borrowed
 
-    def calculate_penalty(self) -> float:
-            if self.returned_date > self.due_date:
-                days_late = (self.returned_date - self.due_date).days
-                total_penalty = days_late * self.daily_penalty_value
-            else:
-                total_penalty = 0.00
-            return total_penalty
+class ReturningTransaction(models.Model):
+    books = models.ManyToManyField(LibraryBook, related_name='returned_books')
+    borrower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    return_date = models.DateField(auto_now_add=True)
+    late_return_penalty = models.DecimalField(max_digits=6, decimal_places=2, default=0.0)
+
+    def __str__(self):
+        return f"{self.books.count()} book(s) returned by {self.borrower.username}"
