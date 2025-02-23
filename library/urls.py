@@ -6,7 +6,7 @@ router = DefaultRouter()
 router.register(prefix='libraries', viewset=views.LibraryViewSet, basename='library')
 router.register(prefix='authors', viewset=views.AuthorViewSet, basename='author')
 router.register(prefix='books', viewset=views.BookViewSet, basename='book')
-router.register(prefix='transctions', viewset=views.BorrowingTransactionViewSet, basename='borrowing-transaction')
+router.register(prefix='transctions', viewset=views.TransactionsViewSet, basename='borrowing-transaction')
 
 urlpatterns = [
     path('', include(router.urls)),
