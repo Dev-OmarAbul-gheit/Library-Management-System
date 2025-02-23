@@ -5,10 +5,10 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Library, Author, Book, BorrowingTransaction
+from .models import Library, Author, Book, BorrowingTransaction, ReturningTransaction
 from .serializers import (LibrarySerializer, AuthorSerializer,
                           BookSerializer, CreateBorrowingTransactionSerializer,
-                          BorrowingTransactionSerializer)
+                          BorrowingTransactionSerializer, ReturningTransactionSerializer)
 
 
 class LibraryViewSet(ReadOnlyModelViewSet):
@@ -36,13 +36,19 @@ class BookViewSet(ReadOnlyModelViewSet):
     serializer_class = BookSerializer
 
 
-class BorrowingTransactionViewSet(ReadOnlyModelViewSet):
-    queryset = BorrowingTransaction.objects.all()
+class TransactionsViewSet(ReadOnlyModelViewSet):
     permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        if self.action == 'borrow_book':
+            return BorrowingTransaction.objects.all()
+        return ReturningTransaction.objects.all()
 
     def get_serializer_class(self):
         if self.action == 'borrow_book':
-            return CreateBorrowingTransactionSerializer            
+            return CreateBorrowingTransactionSerializer
+        elif self.action == 'return_book':
+            return ReturningTransactionSerializer
         return BorrowingTransactionSerializer
 
     @action(detail=False, methods=['post'], url_path='borrow', url_name='borrow-book', permission_classes=[IsAuthenticated])
@@ -55,6 +61,21 @@ class BorrowingTransactionViewSet(ReadOnlyModelViewSet):
     
     @action(detail=False, methods=['get'], url_path='history', url_name='transactions-history', permission_classes=[IsAuthenticated])
     def view_history(self, request):
-        queryset = self.get_queryset().filter(borrower=request.user)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        borrowing_queryset = BorrowingTransaction.objects.filter(borrower=request.user)
+        borrowing_serializer = BorrowingTransactionSerializer(borrowing_queryset, many=True)
+
+        returning_queryset = ReturningTransaction.objects.filter(borrower=request.user)
+        returning_serializer = ReturningTransactionSerializer(returning_queryset, many=True)
+
+        data = {
+            'borrowing_transactions': borrowing_serializer.data,
+            'returning_transactions': returning_serializer.data
+        }
+        return Response(data)
+    
+    @action(detail=False, methods=['post'], url_path='return', url_name='return-book', permission_classes=[IsAuthenticated])
+    def return_book(self, request):
+        serializer = self.get_serializer(data=request.data, context = {'borrower': request.user})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

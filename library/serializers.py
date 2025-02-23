@@ -2,7 +2,7 @@ from datetime import timedelta
 from decimal import Decimal
 from django.utils import timezone
 from rest_framework import serializers
-from .models import Library, Author, Book, LibraryBook, BorrowingTransaction
+from .models import Library, Author, Book, LibraryBook, BorrowingTransaction, ReturningTransaction
 
 
 class LibrarySerializer(serializers.ModelSerializer):
@@ -34,8 +34,9 @@ class BorrowingTransactionSerializer(serializers.ModelSerializer):
         fields = ['id', 'books', 'borrower', 'borrowing_price', 'borrowing_date', 'due_date']
 
 
-class CreateBorrowingTransactionSerializer(serializers.ModelSerializer):
 
+
+class CreateBorrowingTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = BorrowingTransaction
         fields = ['id', 'books', 'due_date']
@@ -44,7 +45,7 @@ class CreateBorrowingTransactionSerializer(serializers.ModelSerializer):
     
         # check the number of books being borrowed by the user
         borrower = self.context['borrower']
-        total_borrowed_books = sum(transaction.books.count() for transaction in BorrowingTransaction.objects.filter(borrower=borrower))
+        total_borrowed_books = sum([transaction.books.filter(is_borrowed=True).count() for transaction in BorrowingTransaction.objects.filter(borrower=borrower)])
         if total_borrowed_books >= 3:
             raise serializers.ValidationError('The user has already borrowed 3 books, can not borrow more books.')
         
@@ -65,6 +66,8 @@ class CreateBorrowingTransactionSerializer(serializers.ModelSerializer):
         max_return_date = borrowing_date + timedelta(days=max_period_month * 30)
         if due_date > max_return_date:
             raise serializers.ValidationError(f'Return date cannot be more than {max_period_month} month(s) from today.')
+        elif due_date < timezone.now().date():
+            raise serializers.ValidationError('Return date cannot be in the past.')
 
         return validated_data
     
@@ -81,9 +84,50 @@ class CreateBorrowingTransactionSerializer(serializers.ModelSerializer):
         # create the borrowing transaction
         borrowing_transaction = super().create(validated_data)
 
-        # set the books as borrowed
-        for book in borrowing_transaction.books.all():
-            book.is_borrowed = True
-            book.save()
-
         return borrowing_transaction
+    
+
+class ReturningTransactionSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ReturningTransaction
+        fields = ['id', 'books', 'borrower', 'return_date', 'late_return_penalty']
+        extra_kwargs = {
+            'borrower': {'read_only': True},
+            'returning_date': {'read_only': True},
+            'late_return_penalty': {'read_only': True}
+        }
+
+    def get_borrower_books(self, borrower):
+        borrower_books = {
+            book: transaction.due_date for transaction in BorrowingTransaction.objects.filter(borrower=borrower) for book in transaction.books.all() if book.is_borrowed
+        }
+        return borrower_books
+    
+    def get_book_penalty(self, book, due_date):
+        today = timezone.now().date()
+        late_days = (today - due_date).days
+        penalty = 0.0
+        if late_days > 0:
+            penalty = book.book.price * Decimal(0.05) * late_days
+        return penalty
+
+    def validate_books(self, returned_books):
+        borrower = self.context['borrower']
+        borrower_books = self.get_borrower_books(borrower)
+        for book in returned_books:
+            if book not in borrower_books:
+                raise serializers.ValidationError(f'The book "{book.book.title}" is not being borrowed by the user.')     
+        return returned_books
+    
+    def create(self, validated_data):
+        borrower = self.context['borrower']
+        validated_data['borrower'] = borrower
+
+        # handle late return penalty for each book, assume daily penalty is 5% of the book price
+        books = validated_data['books']
+        borrower_books = self.get_borrower_books(borrower)
+        total_penalty = sum([self.get_book_penalty(book, borrower_books[book]) for book in books])
+        validated_data['late_return_penalty'] = total_penalty
+
+        return super().create(validated_data)
