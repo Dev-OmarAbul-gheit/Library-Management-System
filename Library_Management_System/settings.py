@@ -143,14 +143,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-DJOSER = {
-    'USER_ID_FIELD': 'id',
-    'LOGIN_FIELD': 'email',
-    'SERIALIZERS': {
-        'user_create': 'system.serializers.RegisterUserSerializer',
-    },
-}
-
 from datetime import timedelta
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
