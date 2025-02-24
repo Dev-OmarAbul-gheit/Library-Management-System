@@ -2,7 +2,7 @@ from datetime import timedelta
 from decimal import Decimal
 from django.utils import timezone
 from rest_framework import serializers
-from .models import Library, Author, Book, LibraryBook, BorrowingTransaction, ReturningTransaction
+from .models import Library, Author, Book, Category, LibraryBook, BorrowingTransaction, ReturningTransaction
 
 
 class LibrarySerializer(serializers.ModelSerializer):
@@ -32,8 +32,6 @@ class BorrowingTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = BorrowingTransaction
         fields = ['id', 'books', 'borrower', 'borrowing_price', 'borrowing_date', 'due_date']
-
-
 
 
 class CreateBorrowingTransactionSerializer(serializers.ModelSerializer):
@@ -131,3 +129,23 @@ class ReturningTransactionSerializer(serializers.ModelSerializer):
         validated_data['late_return_penalty'] = total_penalty
 
         return super().create(validated_data)
+    
+
+class SimpleCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name']
+
+
+class SimpleBookSerializer(serializers.ModelSerializer):
+    category = SimpleCategorySerializer()
+    class Meta:
+        model = Book
+        fields = ['id', 'title', 'summary', 'category']
+
+
+class LoadedAuthorSerializer(serializers.ModelSerializer):
+    books = SimpleBookSerializer(many=True)
+    class Meta:
+        model = Author
+        fields = ['id', 'name', 'bio', 'books']
