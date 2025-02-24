@@ -1,16 +1,18 @@
-from datetime import timedelta
 from decimal import Decimal
+from datetime import timedelta
 from django.utils import timezone
+from django.contrib.gis.geos import Point
 from rest_framework import serializers
 from .models import Library, Author, Book, Category, LibraryBook, BorrowingTransaction, ReturningTransaction
 
 
 class LibrarySerializer(serializers.ModelSerializer):
     coordinates = serializers.ListField(child=serializers.FloatField())
+    distance = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Library
-        fields = ['id', 'name', 'location', 'coordinates']
+        fields = ['id', 'name', 'location', 'coordinates', 'distance']
 
 
 class AuthorSerializer(serializers.ModelSerializer):

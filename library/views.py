@@ -1,4 +1,6 @@
 from django.db.models import Count
+from django.contrib.gis.geos import Point
+from django.contrib.gis.db.models.functions import Distance
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -6,16 +8,26 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Library, Author, Book, BorrowingTransaction, ReturningTransaction
-from .serializers import (LibrarySerializer, AuthorSerializer, LoadedAuthorSerializer,
+from .serializers import (LibrarySerializer,
+                          AuthorSerializer, LoadedAuthorSerializer,
                           BookSerializer, CreateBorrowingTransactionSerializer,
                           BorrowingTransactionSerializer, ReturningTransactionSerializer)
+from .filters import LibraryFilter
 
 
 class LibraryViewSet(ReadOnlyModelViewSet):
-    queryset = Library.objects.prefetch_related('books__category', 'books__author').distinct().all()
+    queryset = Library.objects.all()
     serializer_class = LibrarySerializer
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['id', 'books__category', 'books__author']
+    filterset_class = LibraryFilter
+
+    def get_queryset(self):
+        user_coordinates = self.request.user.coordinates
+        queryset = super().get_queryset().prefetch_related('books__category', 'books__author').distinct()
+        if user_coordinates:
+            return queryset.annotate_distance(user_coordinates)
+        return queryset
 
 
 class AuthorViewSet(ReadOnlyModelViewSet):
