@@ -6,7 +6,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Library, Author, Book, BorrowingTransaction, ReturningTransaction
-from .serializers import (LibrarySerializer, AuthorSerializer,
+from .serializers import (LibrarySerializer, AuthorSerializer, LoadedAuthorSerializer,
                           BookSerializer, CreateBorrowingTransactionSerializer,
                           BorrowingTransactionSerializer, ReturningTransactionSerializer)
 
@@ -23,9 +23,21 @@ class AuthorViewSet(ReadOnlyModelViewSet):
                      .annotate(book_count=Count('books')) \
                      .prefetch_related('books__category', 'books__libraries') \
                      .all()
-    serializer_class = AuthorSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['books__category', 'books__libraries']
+
+    def get_serializer_class(self):
+        if self.action == 'loaded':
+            return LoadedAuthorSerializer
+        return AuthorSerializer
+
+    @action(detail=False, methods=['GET'], url_path='loaded', url_name='loaded-authors')
+    def loaded(self, request):
+        queryset = Author.objects.prefetch_related('books__category').all()
+        for backend in self.filter_backends:
+            queryset = backend().filter_queryset(self.request, queryset, self)        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class BookViewSet(ReadOnlyModelViewSet):
