@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.gis.db import models as gis_models
+from .mixins import OTPMixin
+from .utils import generate_otp, set_otp_expire_date
 
 
 
@@ -14,10 +16,10 @@ class User(AbstractUser):
         return self.username
 
 
-class PasswordResetOTP(models.Model):
+class PasswordResetOTP(OTPMixin, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    otp = models.CharField(max_length=5, unique=True)
-    expires_at = models.DateTimeField()
+    otp = models.CharField(max_length=5, unique=True, default=generate_otp)
+    expires_at = models.DateTimeField(default=set_otp_expire_date)
 
     def __str__(self):
         return self.otp
