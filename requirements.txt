@@ -48,3 +48,4 @@ urllib3==2.3.0
 virtualenv==20.28.0
 celery[redis]
 redis
+django-lifecycle==1.0.0
