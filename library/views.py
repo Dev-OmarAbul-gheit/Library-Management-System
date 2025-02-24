@@ -46,6 +46,8 @@ class BookViewSet(ReadOnlyModelViewSet):
                    .prefetch_related('libraries') \
                    .all()
     serializer_class = BookSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['category', 'author', 'libraries']
 
 
 class TransactionsViewSet(ReadOnlyModelViewSet):
