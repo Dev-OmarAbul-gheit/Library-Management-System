@@ -83,7 +83,7 @@ class CreateOTPSerializer(serializers.Serializer):
         return PasswordResetOTP.objects.create(user=user)
 
 
-class UpdateUserPassword(serializers.Serializer):
+class UpdateUserPasswordSerializer(serializers.Serializer):
     otp = serializers.CharField()
     new_password = serializers.CharField()
 

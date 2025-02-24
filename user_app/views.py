@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from .models import User
-from .serializers import UserSerializer, RegisterUserSerializer, LoginUserSerializer, CreateOTPSerializer, UpdateUserPassword
+from .serializers import UserSerializer, RegisterUserSerializer, LoginUserSerializer, CreateOTPSerializer, UpdateUserPasswordSerializer
 
 
 class UserViewSet(ModelViewSet):
@@ -19,7 +19,7 @@ class UserViewSet(ModelViewSet):
         elif self.action == 'request_password_reset':
             return CreateOTPSerializer
         elif self.action == 'confirm_password_reset':
-            return UpdateUserPassword
+            return UpdateUserPasswordSerializer
         return UserSerializer
     
     def get_object(self):
