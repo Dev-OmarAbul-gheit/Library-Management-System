@@ -1,14 +1,16 @@
 from django.db import models
 from django.conf import settings
-from datetime import timedelta
 from django.core.exceptions import ValidationError
 from django.contrib.gis.db import models as gis_models
+from .managers import LibraryQuerySet
 
 
 class Library(models.Model):
     name = models.CharField(max_length=255, unique=True)
     location = models.CharField(max_length=255, unique=True)
     coordinates = gis_models.PointField(geography=True, srid=4326, null=True, blank=True)
+
+    objects = LibraryQuerySet().as_manager()
 
     def __str__(self):
         return self.name
