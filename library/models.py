@@ -25,6 +25,7 @@ class Library(models.Model):
     class Meta:
         verbose_name = 'Library'
         verbose_name_plural = 'Libraries'
+        ordering = ['name']
 
 
 class Author(models.Model):
