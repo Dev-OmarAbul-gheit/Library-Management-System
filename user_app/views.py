@@ -1,67 +1,55 @@
-from django.contrib.auth.hashers import make_password
-from django.core.mail import BadHeaderError
-from rest_framework.generics import CreateAPIView
-from rest_framework.mixins import CreateModelMixin
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.response import Response
 from rest_framework import status
-from templated_mail.mail import BaseEmailMessage
-from .models import User, PasswordResetOTP
-from .serializers import RegisterUserSerializer, LoginUserSerializer, CreateOTPSerializer, UpdateUserPassword
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from .models import User
+from .serializers import UserSerializer, RegisterUserSerializer, LoginUserSerializer, CreateOTPSerializer, UpdateUserPassword
 
 
-class RegisterViewSet(CreateModelMixin, GenericViewSet):
+class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = RegisterUserSerializer
+    permission_classes = [IsAdminUser]
 
+    def get_serializer_class(self):
+        if self.action == 'register':
+            return RegisterUserSerializer
+        elif self.action == 'login':
+            return LoginUserSerializer
+        elif self.action == 'request_password_reset':
+            return CreateOTPSerializer
+        elif self.action == 'confirm_password_reset':
+            return UpdateUserPassword
+        return UserSerializer
+    
+    def get_object(self):
+        return self.request.user
 
-class LoginViewSet(CreateModelMixin, GenericViewSet):
-    queryset = User.objects.all()
-    serializer_class = LoginUserSerializer
-
-    def create(self, request):
-        serializer = LoginUserSerializer(data=request.data)
+    @action(detail=False, methods=['POST'],  url_path='register', url_name='user-registeration', permission_classes=[AllowAny])
+    def register(self, request):
+        return super().create(request)
+    
+    @action(detail=False, methods=['POST'], url_path='login', url_name='user-login', permission_classes=[AllowAny])
+    def login(self, request):
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class RequestPasswordResetViewSet(CreateModelMixin, GenericViewSet):
-    queryset = PasswordResetOTP.objects.all()
-    serializer_class = CreateOTPSerializer
-
-    def create(self, request):
-        serializer = CreateOTPSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.save()
-
-        otp = data['otp']
-        username = data['username']
-        user_email = data['email']
-
-        context = {
-            'subject': 'Password Reset Request',
-            'username' : username,
-            'otp' : otp,
-            'reset_link' : f'http://127.0.0.1:8000/api/password-reset/confirm/otp={otp}'
-        }
-
-        try:
-            message = BaseEmailMessage(template_name='emails/password-reset-email.html', context=context)
-            message.send(from_email='admin@system.com', to=[user_email])
-
-        except BadHeaderError:
-            return Response({'error': 'Invalid header found.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({'message': 'Password reset email sent.'}, status=status.HTTP_200_OK)
     
+    @action(detail=False, methods=['GET'], url_path='me', url_name='get-user', permission_classes=[IsAuthenticated])
+    def me(self, request):
+        return super().retrieve(request)
+    
+    @action(detail=False, methods=['POST'], url_path='password-reset/request', url_name='request-password-reset', permission_classes=[AllowAny])
+    def request_password_reset(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'message': 'We have sent password reset email with confirmation code to you.'}, status=status.HTTP_200_OK)
 
-class ConfirmPasswordResetViewSet(CreateAPIView, GenericViewSet):
-    queryset = User.objects.all()
-    serializer_class = UpdateUserPassword
-
-    def create(self, request):
-        serializer = UpdateUserPassword(data=request.data)
+    @action(detail=False, methods=['POST'], url_path='password-reset/confirm', url_name='confirm-password-reset', permission_classes=[AllowAny])
+    def confirm_password_reset(self, request):
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'message': 'Your password has been reset successfully.'}, status=status.HTTP_200_OK)

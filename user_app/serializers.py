@@ -1,8 +1,7 @@
-from django.forms import ValidationError
 from django.utils import timezone
 from django.db import transaction
+from django.forms import ValidationError
 from django.contrib.auth import authenticate
-from django.utils.crypto import get_random_string
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
@@ -10,9 +9,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from djoser.serializers import UserCreateSerializer
 from .models import User, PasswordResetOTP
 
-class UserSerializer(serializers.Serializer):    
-    email = serializers.EmailField(write_only=True)
-    password = serializers.CharField(write_only=True)
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
+        
+class TokenSerializer(serializers.Serializer):    
     refresh_token = serializers.CharField(read_only=True)
     access_token = serializers.CharField(read_only=True)
 
@@ -26,20 +28,24 @@ class UserSerializer(serializers.Serializer):
         return {'refresh_token' : str(refresh_token), 'access_token' : str(access_token)}
 
 
-class RegisterUserSerializer(UserSerializer, UserCreateSerializer):
-    username = serializers.CharField(write_only=True)
+class RegisterUserSerializer(TokenSerializer, UserCreateSerializer):
     
     class Meta(UserCreateSerializer.Meta):
         fields = ['username', 'email', 'password', 'refresh_token', 'access_token']
+        extra_kwargs = {
+            'username': {'write_only': True},
+            'email': {'write_only': True},
+            'password': {'write_only': True},
+        }
 
     def validate_username(self, username):
         if User.objects.filter(username=username).exists():
-            raise serializers.ValidationError('A user with this username already exists.')
+            raise serializers.ValidationError('A user with the given username is already exists.')
         return username
 
     def validate_email(self, email):
         if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError('A user with this email already exists.')
+            raise serializers.ValidationError('A user with the given email is already exists.')
         return email
 
     def create(self, validated_data):
@@ -47,7 +53,9 @@ class RegisterUserSerializer(UserSerializer, UserCreateSerializer):
         return self.create_user_tokens(user)
 
 
-class LoginUserSerializer(UserSerializer, serializers.Serializer):
+class LoginUserSerializer(TokenSerializer, serializers.Serializer):
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True)
     def authenticate_user(self, credentials):
         email = credentials['email']
         password = credentials['password']
@@ -62,7 +70,7 @@ class LoginUserSerializer(UserSerializer, serializers.Serializer):
 
 
 class CreateOTPSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+    email = serializers.EmailField(write_only=True)
 
     def validate_email(self,email):
         if not User.objects.filter(email=email).exists():
@@ -72,12 +80,8 @@ class CreateOTPSerializer(serializers.Serializer):
     def create(self, validated_data):
         email = validated_data['email']
         user = User.objects.get(email=email)
+        return PasswordResetOTP.objects.create(user=user)
 
-        otp = get_random_string(length=5)
-        expires_at = timezone.now() + timezone.timedelta(minutes=10)
-        PasswordResetOTP.objects.create(user=user, otp=otp, expires_at=expires_at)
-        return {'username': user.username, 'email': email, 'otp': otp}
-    
 
 class UpdateUserPassword(serializers.Serializer):
     otp = serializers.CharField()
