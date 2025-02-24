@@ -1,12 +1,9 @@
 from django.db.models import Count
-from django.contrib.gis.geos import Point
-from django.contrib.gis.db.models.functions import Distance
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
 from .models import Library, Author, Book, BorrowingTransaction, ReturningTransaction
 from .serializers import (LibrarySerializer,
                           AuthorSerializer, LoadedAuthorSerializer,
@@ -19,7 +16,6 @@ class LibraryViewSet(ReadOnlyModelViewSet):
     queryset = Library.objects.all()
     serializer_class = LibrarySerializer
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
     filterset_class = LibraryFilter
 
     def get_queryset(self):
@@ -35,7 +31,6 @@ class AuthorViewSet(ReadOnlyModelViewSet):
                      .annotate(book_count=Count('books')) \
                      .prefetch_related('books__category', 'books__libraries') \
                      .all()
-    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['books__category', 'books__libraries']
 
     def get_serializer_class(self):
@@ -58,7 +53,6 @@ class BookViewSet(ReadOnlyModelViewSet):
                    .prefetch_related('libraries') \
                    .all()
     serializer_class = BookSerializer
-    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['category', 'author', 'libraries']
 
 
