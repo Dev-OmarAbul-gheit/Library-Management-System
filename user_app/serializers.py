@@ -3,6 +3,7 @@ from django.db import transaction
 from django.forms import ValidationError
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -40,12 +41,12 @@ class RegisterUserSerializer(TokenSerializer, UserCreateSerializer):
 
     def validate_username(self, username):
         if User.objects.filter(username=username).exists():
-            raise serializers.ValidationError('A user with the given username is already exists.')
+            raise serializers.ValidationError(_('A user with the given username is already exists.'))
         return username
 
     def validate_email(self, email):
         if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError('A user with the given email is already exists.')
+            raise serializers.ValidationError(_('A user with the given email is already exists.'))
         return email
 
     def create(self, validated_data):
@@ -60,7 +61,7 @@ class LoginUserSerializer(TokenSerializer, serializers.Serializer):
         email = credentials['email']
         password = credentials['password']
         if not(user := authenticate(email=email, password=password)):
-            raise serializers.ValidationError('Invalid credentials')
+            raise serializers.ValidationError(_('Invalid credentials'))
         else:
             return user
 
@@ -74,7 +75,7 @@ class CreateOTPSerializer(serializers.Serializer):
 
     def validate_email(self,email):
         if not User.objects.filter(email=email).exists():
-            raise serializers.ValidationError('No user exists with the given email address.')
+            raise serializers.ValidationError(_('No user exists with the given email address.'))
         return email
 
     def create(self, validated_data):
@@ -89,7 +90,7 @@ class UpdateUserPasswordSerializer(serializers.Serializer):
 
     def validate_otp(self, otp):
         if not PasswordResetOTP.objects.filter(otp=otp, expires_at__gt=timezone.now()).exists():
-            raise serializers.ValidationError('Invalid or expired confirmation code.')
+            raise serializers.ValidationError(_('Invalid or expired confirmation code.'))
         return otp
     
     def validate_new_password(self, new_password):

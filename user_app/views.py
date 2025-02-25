@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -45,11 +46,11 @@ class UserViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'message': 'We have sent password reset email with confirmation code to you.'}, status=status.HTTP_200_OK)
+        return Response({_('message'): _('We have sent password reset email with confirmation code to you.')}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['POST'], url_path='password-reset/confirm', url_name='confirm-password-reset', permission_classes=[AllowAny])
     def confirm_password_reset(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'message': 'Your password has been reset successfully.'}, status=status.HTTP_200_OK)
+        return Response({_('message'): _('Your password has been reset successfully.')}, status=status.HTTP_200_OK)
