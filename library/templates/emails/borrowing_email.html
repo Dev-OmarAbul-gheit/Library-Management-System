@@ -1,8 +1,8 @@
 {% block html_body %}
-    <div style="font-family: Arial, sans-serif; color: #333;">
-        <h1 style="color: #4CAF50;">Hello, {{ username }}!</h1>
-        <p>Your book borrowing has been confirmed. Here are the details:</p>
-        <ul style="list-style-type: none; padding: 0;">
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+        <h2 style="color: #333;">Hello, {{ username }}!</h2>
+        <p style="color: #555; font-size: 16px;">Your book borrowing has been confirmed. Here are the details:</p>
+        <ul style="list-style-type: none; padding: 0; color: #555; font-size: 16px;">
             <li><strong>Borrowing Date:</strong> {{ borrowing_date }}</li>
             <li><strong>Due Date:</strong> {{ due_date }}</li>
             <li><strong>Borrowed Books:</strong>
@@ -15,7 +15,7 @@
                 </ul>
             </li>
         </ul>
-        <p>Thank you for using our platform. Please return the books at due date.</p>
-        <p class="footer" style="margin-top: 20px; font-size: 0.9em; color: #777;">Best regards,<br>Platform Team</p>
+        <p style="color: #555; font-size: 16px;">Thank you for using our platform. Please return the books at due date.</p>
+        <p class="footer" style="margin-top: 20px; font-size: 12px; color: #999;">Best regards,<br>Platform Team</p>
     </div>
 {% endblock %}
