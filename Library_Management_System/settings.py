@@ -129,8 +129,6 @@ USE_L10N = True
 LANGUAGES = [
     ('en', _('English')),
     ('ar', _('Arabic')),
-    ('fr', _('French')),
-    ('es', _('Spanish')),
 ]
 
 LOCALE_PATHS = [
