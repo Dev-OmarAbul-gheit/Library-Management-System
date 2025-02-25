@@ -21,7 +21,7 @@ def notify_borrowers_async():
     queryset = BorrowingTransaction.objects.select_related('borrower').prefetch_related('books__book')
     transactions = [
         transaction for transaction in queryset 
-        if transaction.due_date - timezone.now().date() <= timezone.timedelta(days=3) 
+        if (transaction.due_date - timezone.now().date()) <= timezone.timedelta(days=3) 
         and transaction.books.filter(is_borrowed=True).exists()
     ]
 
@@ -43,5 +43,3 @@ def notify_borrowers_async():
             recipient_list=[transaction.borrower.email],
             html_message=html_message,
         )
-
-    
