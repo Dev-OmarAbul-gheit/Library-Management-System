@@ -24,6 +24,9 @@ WORKDIR /code
 COPY ./requirements.txt /requirements.txt
 RUN pip install --cache-dir ~/.pip_cache -r /requirements.txt
 
+# Format code with Black (optional)
+RUN black --check .
+
 # Copy entrypoint and start scripts
 # COPY ./compose/local/start.sh /start.sh
 

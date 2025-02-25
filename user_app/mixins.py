@@ -8,9 +8,9 @@ class OTPMixin(LifecycleModelMixin):
     @hook(AFTER_CREATE)
     def send_email_with_otp(self):
         data = {
-            'username': self.user.username,
-            'email' : self.user.email,
-            'otp': self.otp,
-            'reset_link' : f'http://127.0.0.1:8000/users/password-reset/confirm/'
+            "username": self.user.username,
+            "email": self.user.email,
+            "otp": self.otp,
+            "reset_link": f"http://127.0.0.1:8000/users/password-reset/confirm/",
         }
         send_email_with_otp__async.delay(data)

@@ -7,21 +7,23 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('library', '0008_borrowingtransaction'),
+        ("library", "0008_borrowingtransaction"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='library',
-            name='latitude',
+            model_name="library",
+            name="latitude",
         ),
         migrations.RemoveField(
-            model_name='library',
-            name='longitude',
+            model_name="library",
+            name="longitude",
         ),
         migrations.AddField(
-            model_name='library',
-            name='coordinates',
-            field=django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
+            model_name="library",
+            name="coordinates",
+            field=django.contrib.gis.db.models.fields.PointField(
+                blank=True, geography=True, null=True, srid=4326
+            ),
         ),
     ]

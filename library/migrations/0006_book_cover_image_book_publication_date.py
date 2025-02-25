@@ -6,19 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('library', '0005_rename_booklibrary_librarybook'),
+        ("library", "0005_rename_booklibrary_librarybook"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='book',
-            name='cover_image',
-            field=models.ImageField(default=1, upload_to='library/book/images'),
+            model_name="book",
+            name="cover_image",
+            field=models.ImageField(default=1, upload_to="library/book/images"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='book',
-            name='publication_date',
+            model_name="book",
+            name="publication_date",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

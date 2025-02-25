@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('library', '0014_remove_borrowingtransaction_book_and_more'),
+        ("library", "0014_remove_borrowingtransaction_book_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='borrowingtransaction',
-            name='is_returned',
+            model_name="borrowingtransaction",
+            name="is_returned",
             field=models.BooleanField(default=False),
         ),
     ]

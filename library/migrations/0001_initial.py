@@ -8,22 +8,45 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Library',
+            name="Library",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, unique=True)),
-                ('location', models.CharField(max_length=255, unique=True)),
-                ('latitude', models.FloatField(validators=[django.core.validators.MinValueValidator(-90), django.core.validators.MaxValueValidator(90)])),
-                ('longitude', models.FloatField(validators=[django.core.validators.MinValueValidator(-180), django.core.validators.MaxValueValidator(180)])),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, unique=True)),
+                ("location", models.CharField(max_length=255, unique=True)),
+                (
+                    "latitude",
+                    models.FloatField(
+                        validators=[
+                            django.core.validators.MinValueValidator(-90),
+                            django.core.validators.MaxValueValidator(90),
+                        ]
+                    ),
+                ),
+                (
+                    "longitude",
+                    models.FloatField(
+                        validators=[
+                            django.core.validators.MinValueValidator(-180),
+                            django.core.validators.MaxValueValidator(180),
+                        ]
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Library',
-                'verbose_name_plural': 'Libraries',
+                "verbose_name": "Library",
+                "verbose_name_plural": "Libraries",
             },
         ),
     ]

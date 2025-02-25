@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('library', '0017_returningtransaction'),
+        ("library", "0017_returningtransaction"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='returningtransaction',
-            name='late_return_penalty',
+            model_name="returningtransaction",
+            name="late_return_penalty",
             field=models.DecimalField(decimal_places=2, default=0.0, max_digits=6),
         ),
     ]

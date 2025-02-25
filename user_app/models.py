@@ -5,12 +5,13 @@ from .mixins import OTPMixin
 from .utils import generate_otp, set_otp_expire_date
 
 
-
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
-    coordinates = gis_models.PointField(geography=True, srid=4326, null=True, blank=True)
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
+    coordinates = gis_models.PointField(
+        geography=True, srid=4326, null=True, blank=True
+    )
 
     def __str__(self) -> str:
         return self.username

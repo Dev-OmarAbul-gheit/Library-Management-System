@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('library', '0009_remove_library_latitude_remove_library_longitude_and_more'),
+        ("library", "0009_remove_library_latitude_remove_library_longitude_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='book',
-            name='cover_image',
-            field=models.ImageField(blank=True, null=True, upload_to='library/books/images'),
+            model_name="book",
+            name="cover_image",
+            field=models.ImageField(
+                blank=True, null=True, upload_to="library/books/images"
+            ),
         ),
     ]

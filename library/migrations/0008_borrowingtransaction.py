@@ -8,21 +8,41 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('library', '0007_alter_book_cover_image'),
+        ("library", "0007_alter_book_cover_image"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BorrowingTransaction',
+            name="BorrowingTransaction",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('price', models.DecimalField(decimal_places=2, max_digits=6)),
-                ('borrowing_date', models.DateField(auto_now_add=True)),
-                ('due_date', models.DateField()),
-                ('returned_date', models.DateField(blank=True, null=True)),
-                ('library_book', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='library.librarybook')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("price", models.DecimalField(decimal_places=2, max_digits=6)),
+                ("borrowing_date", models.DateField(auto_now_add=True)),
+                ("due_date", models.DateField()),
+                ("returned_date", models.DateField(blank=True, null=True)),
+                (
+                    "library_book",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="library.librarybook",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

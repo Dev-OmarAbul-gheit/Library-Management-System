@@ -6,17 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('library', '0013_rename_price_borrowingtransaction_borrowing_price'),
+        ("library", "0013_rename_price_borrowingtransaction_borrowing_price"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='borrowingtransaction',
-            name='book',
+            model_name="borrowingtransaction",
+            name="book",
         ),
         migrations.AddField(
-            model_name='borrowingtransaction',
-            name='books',
-            field=models.ManyToManyField(related_name='books', to='library.librarybook'),
+            model_name="borrowingtransaction",
+            name="books",
+            field=models.ManyToManyField(
+                related_name="books", to="library.librarybook"
+            ),
         ),
     ]

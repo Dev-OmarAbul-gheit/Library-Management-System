@@ -7,18 +7,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user_app', '0002_user_coordinates'),
+        ("user_app", "0002_user_coordinates"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='passwordresetotp',
-            name='expires_at',
+            model_name="passwordresetotp",
+            name="expires_at",
             field=models.DateTimeField(default=user_app.utils.set_otp_expire_date),
         ),
         migrations.AlterField(
-            model_name='passwordresetotp',
-            name='otp',
-            field=models.CharField(default=user_app.utils.generate_otp, max_length=5, unique=True),
+            model_name="passwordresetotp",
+            name="otp",
+            field=models.CharField(
+                default=user_app.utils.generate_otp, max_length=5, unique=True
+            ),
         ),
     ]
