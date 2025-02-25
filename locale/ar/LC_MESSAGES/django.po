@@ -1,0 +1,110 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-25 13:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+#: Library_Management_System/settings.py:130
+msgid "English"
+msgstr "الإنجليزية"
+
+#: Library_Management_System/settings.py:131
+msgid "Arabic"
+msgstr "العربية"
+
+#: library/serializers.py:50
+msgid "The user has already borrowed 3 books, can not borrow more books."
+msgstr "المستخدم قد استعار بالفعل 3 كتب، لا يمكنه استعارة المزيد من الكتب."
+
+#: library/serializers.py:55
+msgid ""
+"You cannot borrow {len(books)} more books as you already borrowed "
+"{total_borrowed_books} and you can not borrow more than 3 books."
+msgstr "لا يمكنك استعارة {len(books)} كتب إضافية لأنك قد استعرْت بالفعل {total_borrowed_books} ولا يمكنك استعارة أكثر من 3 كتب."
+
+#: library/serializers.py:60
+#, python-brace-format
+msgid ""
+"The book \"{book.book.title}\" is currently being borrowed, choose another "
+"book or try again later."
+msgstr "الكتاب \"{book.book.title}\" مستعار حالياً، اختر كتاباً آخر أو حاول مرة أخرى لاحقاً."
+
+#: library/serializers.py:68
+#, python-brace-format
+msgid "Return date cannot be more than {max_period_month} month(s) from today."
+msgstr "تاريخ الإرجاع لا يمكن أن يكون أكثر من {max_period_month} شهر(أشهر) من اليوم."
+
+#: library/serializers.py:70
+msgid "Return date cannot be in the past."
+msgstr "تاريخ الإرجاع لا يمكن أن يكون في الماضي."
+
+#: library/serializers.py:120
+#, python-brace-format
+msgid "The book \"{book.book.title}\" is not being borrowed by the user."
+msgstr "الكتاب \"{book.book.title}\" لم يتم استعارته من قبل المستخدم."
+
+#: library/views.py:29
+msgid "error"
+msgstr "خطأ"
+
+#: library/views.py:29
+msgid "User does not have coordinates"
+msgstr "المستخدم ليس لديه إحداثيات"
+
+#: user_app/admin.py:12
+msgid "Personal info"
+msgstr "معلومات شخصية"
+
+#: user_app/admin.py:14
+msgid "Permissions"
+msgstr "أذونات"
+
+#: user_app/admin.py:25
+msgid "Important dates"
+msgstr "تواريخ مهمة"
+
+#: user_app/serializers.py:44
+msgid "A user with the given username is already exists."
+msgstr "يوجد مستخدم بالفعل بالاسم المستخدم المعطى."
+
+#: user_app/serializers.py:49
+msgid "A user with the given email is already exists."
+msgstr "يوجد مستخدم بالفعل بالبريد الإلكتروني المعطى."
+
+#: user_app/serializers.py:64
+msgid "Invalid credentials"
+msgstr "بيانات اعتماد غير صالحة"
+
+#: user_app/serializers.py:78
+msgid "No user exists with the given email address."
+msgstr "لا يوجد مستخدم بالبريد الإلكتروني المعطى."
+
+#: user_app/serializers.py:93
+msgid "Invalid or expired confirmation code."
+msgstr "رمز التأكيد غير صالح أو منتهي الصلاحية."
+
+#: user_app/views.py:49 user_app/views.py:56
+msgid "message"
+msgstr "رسالة"
+
+#: user_app/views.py:49
+msgid "We have sent password reset email with confirmation code to you."
+msgstr "لقد أرسلنا لك بريدًا إلكترونيًا لإعادة تعيين كلمة المرور مع رمز التأكيد."
+
+#: user_app/views.py:56
+msgid "Your password has been reset successfully."
+msgstr "تم إعادة تعيين كلمة المرور الخاصة بك بنجاح."
