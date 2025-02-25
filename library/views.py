@@ -13,17 +13,19 @@ from .filters import LibraryFilter
 
 
 class LibraryViewSet(ReadOnlyModelViewSet):
-    queryset = Library.objects.all()
+    queryset = Library.objects.prefetch_related('books__category', 'books__author').distinct().all()
     serializer_class = LibrarySerializer
     permission_classes = [IsAuthenticated]
     filterset_class = LibraryFilter
 
-    def get_queryset(self):
+    @action(detail=False, methods=['GET'], url_path='nearby', url_name='libraries-nearby-to-user')
+    def sort_libraries_by_distance_to_user(self, request):
         user_coordinates = self.request.user.coordinates
-        queryset = super().get_queryset().prefetch_related('books__category', 'books__author').distinct()
         if user_coordinates:
-            return queryset.annotate_distance(user_coordinates)
-        return queryset
+            queryset = super().get_queryset().annotate_distance(user_coordinates)
+            serializer = super().get_serializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'error': 'User does not have coordinates'})
 
 
 class AuthorViewSet(ReadOnlyModelViewSet):
