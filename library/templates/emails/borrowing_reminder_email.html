@@ -1,0 +1,11 @@
+{% block html_body %}
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+        <h2 style="color: #333;">Hello {{username}},</h2>
+        <p style="color: #555; font-size: 16px;">Remember to return the following book(s) by {{due_date}}:</p>
+        <ul>
+            {% for book in books %}
+                <li style="color: #555; font-size: 16px;">{{book.title}} by {{book.author}} at {{book.library}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
