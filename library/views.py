@@ -25,7 +25,7 @@ class LibraryViewSet(ReadOnlyModelViewSet):
             queryset = super().get_queryset().annotate_distance(user_coordinates)
             serializer = super().get_serializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({'error': 'User does not have coordinates'})
+        return Response({'error': 'User does not have coordinates'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AuthorViewSet(ReadOnlyModelViewSet):
