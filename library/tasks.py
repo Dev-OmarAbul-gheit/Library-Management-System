@@ -18,7 +18,7 @@ def send_borrowing_email_async(borrowing_data):
 
 @shared_task
 def notify_borrowers_async():
-    queryset = BorrowingTransaction.objects.select_related('borrower').prefetch_related('books__book')
+    queryset = BorrowingTransaction.objects.select_related('borrower').prefetch_related('books__book', 'books__library')
     transactions = [
         transaction for transaction in queryset 
         if (transaction.due_date - timezone.now().date()) <= timezone.timedelta(days=3) 
