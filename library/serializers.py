@@ -1,7 +1,7 @@
 from decimal import Decimal
 from datetime import timedelta
 from django.utils import timezone
-from django.contrib.gis.geos import Point
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from .models import Library, Author, Book, Category, LibraryBook, BorrowingTransaction, ReturningTransaction
 
@@ -47,17 +47,17 @@ class CreateBorrowingTransactionSerializer(serializers.ModelSerializer):
         borrower = self.context['borrower']
         total_borrowed_books = sum([transaction.books.filter(is_borrowed=True).count() for transaction in BorrowingTransaction.objects.filter(borrower=borrower)])
         if total_borrowed_books >= 3:
-            raise serializers.ValidationError('The user has already borrowed 3 books, can not borrow more books.')
+            raise serializers.ValidationError(_('The user has already borrowed 3 books, can not borrow more books.'))
         
         # validate the number of books at current borrowing transaction
         books = validated_data['books']
         if total_borrowed_books+ len(books) > 3:
-            raise serializers.ValidationError(f'You cannot borrow {len(books)} more books as you already borrowed {total_borrowed_books} and you can not borrow more than 3 books.')
+            raise serializers.ValidationError(_(f'You cannot borrow {len(books)} more books as you already borrowed {total_borrowed_books} and you can not borrow more than 3 books.'))
 
         # validate each book individually to ensure it is not being borrowed
         for book in books:
             if book.is_borrowed:
-                raise serializers.ValidationError(f'The book "{book.book.title}" is currently being borrowed, choose another book or try again later.')
+                raise serializers.ValidationError(_(f'The book "{book.book.title}" is currently being borrowed, choose another book or try again later.'))
 
         # validate the due date
         due_date = validated_data['due_date']
@@ -65,9 +65,9 @@ class CreateBorrowingTransactionSerializer(serializers.ModelSerializer):
         max_period_month = 1
         max_return_date = borrowing_date + timedelta(days=max_period_month * 30)
         if due_date > max_return_date:
-            raise serializers.ValidationError(f'Return date cannot be more than {max_period_month} month(s) from today.')
+            raise serializers.ValidationError(_(f'Return date cannot be more than {max_period_month} month(s) from today.'))
         elif due_date < timezone.now().date():
-            raise serializers.ValidationError('Return date cannot be in the past.')
+            raise serializers.ValidationError(_('Return date cannot be in the past.'))
 
         return validated_data
     
@@ -117,7 +117,7 @@ class ReturningTransactionSerializer(serializers.ModelSerializer):
         borrower_books = self.get_borrower_books(borrower)
         for book in returned_books:
             if book not in borrower_books:
-                raise serializers.ValidationError(f'The book "{book.book.title}" is not being borrowed by the user.')     
+                raise serializers.ValidationError(_(f'The book "{book.book.title}" is not being borrowed by the user.'))
         return returned_books
     
     def create(self, validated_data):
