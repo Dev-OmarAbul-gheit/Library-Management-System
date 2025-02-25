@@ -42,6 +42,13 @@ services:
       - redis
     env_file:
       - .env
+  celery_beat:
+    build: .
+    command: celery -A Library_Management_System beat --loglevel=info
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
 volumes:
   postgres_data:
 
