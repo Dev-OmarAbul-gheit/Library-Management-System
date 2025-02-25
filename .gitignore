@@ -24,3 +24,5 @@ __pycache__/
 # Static and media files (if not versioned)
 staticfiles/
 media/
+
+celerybeat-schedule
