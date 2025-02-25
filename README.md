@@ -104,26 +104,6 @@ make test        # Run tests
 - Celery Worker: None
 - Celery Beat: None
 
-### Project Structure
-├── compose/             # Docker compose files
-├── library_management_system/  # Django project settings
-│   ├── settings/        # Settings module
-│   ├── urls.py          # URL routing
-│   ├── wsgi.py          # WSGI configuration
-│   └── asgi.py          # ASGI configuration
-├── library/             # Library app
-│   ├── migrations/      # Database migrations
-│   ├── models.py        # Database models
-│   ├── serializers.py   # DRF serializers
-│   ├── views.py         # Views
-│   ├── urls.py          # URL routing
-│   └── tests.py         # Tests
-├── requirements/        # Project dependencies
-│   ├── base.txt         # Base requirements
-│   ├── local.txt        # Development requirements
-│   └── production.txt   # Production requirements
-└── manage.py            # Django management script
-
 
 ### Code Quality Tools
 This project uses:
